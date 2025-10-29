@@ -22,12 +22,19 @@ stages:
             displayName: "Build & Test Backend"
 
           # === FRONTEND ===
+          # === FRONTEND ===
+          - task: NodeTool@0
+            inputs:
+              versionSpec: '18.x'
+            displayName: 'Instalar Node.js 18'
+
           - script: |
               echo "🧱 Compilando frontend React..."
-              cd ../marketplace.frontend
+              cd marketplace.frontend
               npm install
               npm run build
             displayName: "Build Frontend"
+
 
           # === PUBLICACIÓN ===
           - task: PublishBuildArtifacts@1
