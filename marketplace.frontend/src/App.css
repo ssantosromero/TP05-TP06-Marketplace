@@ -1,0 +1,48 @@
+body {
+  background: linear-gradient(135deg, #a18cd1, #fbc2eb);
+  min-height: 100vh;
+  color: #333;
+  font-family: "Poppins", sans-serif;
+}
+
+.app-container {
+  padding: 40px;
+}
+
+h1 {
+  color: #fff;
+  font-weight: 700;
+  text-shadow: 1px 1px 3px #00000030;
+}
+
+.card {
+  border-radius: 15px;
+  background-color: #fff;
+  transition: all 0.2s ease;
+}
+
+.card:hover {
+  transform: translateY(-5px);
+}
+
+.card-title {
+  font-weight: 600;
+}
+
+.btn-primary {
+  background-color: #7b2cbf;
+  border: none;
+}
+
+.btn-primary:hover {
+  background-color: #5a189a;
+}
+
+.btn-danger {
+  background-color: #e63946;
+  border: none;
+}
+
+.btn-danger:hover {
+  background-color: #b91d34;
+}
