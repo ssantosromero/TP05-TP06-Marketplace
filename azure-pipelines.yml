@@ -1,61 +1,82 @@
 trigger:
-  - main
+- main
 
 pool:
-  name: Default  # tu agente local: MacBook-Pro-de-Santos
+  name: Default  # Tu agente local, por ejemplo "MacBook-Pro-de-Santos"
 
 stages:
-  - stage: BuildAndTest
-    displayName: "Build & Test"
-    jobs:
-      - job: Build
-        steps:
-          - checkout: self
+# =====================
+# 🧱 BUILD & TEST
+# =====================
+- stage: BuildAndTest
+  displayName: "🏗️ Build & Test"
+  jobs:
+  - job: Build
+    steps:
+    - checkout: self
 
-          # === BACKEND ===
-          - script: |
-              echo "🔧 Compilando API .NET..."
-              cd Marketplace.Api
-              dotnet restore
-              dotnet build --no-restore
-              dotnet test --no-build --logger "trx;LogFileName=test_results.trx"
-            displayName: "Build & Test Backend"
+    # === BACKEND ===
+    - script: |
+        echo "🧩 Compilando API .NET..."
+        cd Marketplace.Api
+        dotnet restore
+        dotnet build --no-restore
+        dotnet test --no-build --logger "trx;LogFileName=test_results.trx"
+      displayName: "Build & Test Backend"
 
-          # === FRONTEND ===
-          # === FRONTEND ===
-          - task: NodeTool@0
-            inputs:
-              versionSpec: '18.x'
-            displayName: 'Instalar Node.js 18'
+    # === FRONTEND ===
+    - script: |
+        echo "🧩 Instalando Node.js 18..."
+        brew install node@18 || true
+        export PATH="/opt/homebrew/opt/node@18/bin:$PATH"
+        node -v
+        npm -v
+      displayName: "Instalar Node.js 18"
 
-          - script: |
-              echo "🧱 Compilando frontend React..."
-              cd marketplace.frontend
-              npm install
-              npm run build
-            displayName: "Build Frontend"
+    - script: |
+        echo "🧱 Construyendo Frontend..."
+        cd marketplace.frontend
+        npm install
+        npm run build
+        mkdir -p ../marketplace-drop/frontend
+        cp -r dist/* ../marketplace-drop/frontend/
+      displayName: "Build Frontend (solo archivos finales)"
 
+    # === PUBLICAR ARTIFACT ===
+    - task: PublishBuildArtifacts@1
+      displayName: "📦 Publicar Artifact Optimizado"
+      inputs:
+        PathtoPublish: 'marketplace-drop'
+        ArtifactName: 'marketplace'
+        publishLocation: 'Container'
+      condition: succeeded()
 
-          # === PUBLICACIÓN ===
-          - task: PublishBuildArtifacts@1
-            inputs:
-              pathToPublish: "$(System.DefaultWorkingDirectory)"
-              artifactName: "marketplace-drop"
+# =====================
+# 🚀 DEPLOY QA
+# =====================
+- stage: QA_Deploy
+  displayName: "Deploy QA"
+  dependsOn: BuildAndTest
+  condition: succeeded()
+  jobs:
+  - job: QA
+    steps:
+    - script: |
+        echo "Desplegando a entorno QA..."
+        echo "Simulación de despliegue QA completada ✅"
+      displayName: "Deploy QA Job"
 
-  - stage: DeployQA
-    displayName: "Deploy QA"
-    dependsOn: BuildAndTest
-    jobs:
-      - job: QA_Deploy
-        steps:
-          - script: echo "🚀 Desplegando en QA (simulado)"
-            displayName: "Deploy QA"
-
-  - stage: DeployPROD
-    displayName: "Deploy Producción"
-    dependsOn: DeployQA
-    jobs:
-      - job: PROD_Deploy
-        steps:
-          - script: echo "🚀 Desplegando en Producción (simulado)"
-            displayName: "Deploy PROD"
+# =====================
+# 🚀 DEPLOY PRODUCCIÓN
+# =====================
+- stage: PROD_Deploy
+  displayName: "Deploy Producción"
+  dependsOn: QA_Deploy
+  condition: succeeded()
+  jobs:
+  - job: PROD
+    steps:
+    - script: |
+        echo "Desplegando a Producción..."
+        echo "Simulación de despliegue Producción completada ✅"
+      displayName: "Deploy PROD Job"
