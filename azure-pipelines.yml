@@ -1,0 +1,54 @@
+trigger:
+  - main
+
+pool:
+  name: Default  # tu agente local: MacBook-Pro-de-Santos
+
+stages:
+  - stage: BuildAndTest
+    displayName: "Build & Test"
+    jobs:
+      - job: Build
+        steps:
+          - checkout: self
+
+          # === BACKEND ===
+          - script: |
+              echo "🔧 Compilando API .NET..."
+              cd Marketplace.Api
+              dotnet restore
+              dotnet build --no-restore
+              dotnet test --no-build --logger "trx;LogFileName=test_results.trx"
+            displayName: "Build & Test Backend"
+
+          # === FRONTEND ===
+          - script: |
+              echo "🧱 Compilando frontend React..."
+              cd ../marketplace.frontend
+              npm install
+              npm run build
+            displayName: "Build Frontend"
+
+          # === PUBLICACIÓN ===
+          - task: PublishBuildArtifacts@1
+            inputs:
+              pathToPublish: "$(System.DefaultWorkingDirectory)"
+              artifactName: "marketplace-drop"
+
+  - stage: DeployQA
+    displayName: "Deploy QA"
+    dependsOn: BuildAndTest
+    jobs:
+      - job: QA_Deploy
+        steps:
+          - script: echo "🚀 Desplegando en QA (simulado)"
+            displayName: "Deploy QA"
+
+  - stage: DeployPROD
+    displayName: "Deploy Producción"
+    dependsOn: DeployQA
+    jobs:
+      - job: PROD_Deploy
+        steps:
+          - script: echo "🚀 Desplegando en Producción (simulado)"
+            displayName: "Deploy PROD"
