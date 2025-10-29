@@ -25,22 +25,19 @@ stages:
       displayName: "Build & Test Backend"
 
     # === FRONTEND ===
-    - script: |
-        echo "🧩 Instalando Node.js 18..."
-        brew install node@18 || true
-        export PATH="/opt/homebrew/opt/node@18/bin:$PATH"
-        node -v
-        npm -v
-      displayName: "Instalar Node.js 18"
+    - task: NodeTool@0
+      inputs:
+        versionSpec: '18.x'
+      displayName: 'Instalar Node.js 18'
 
     - script: |
-        echo "🧱 Construyendo Frontend..."
+        echo "🧱 Construyendo Frontend (React CRA)..."
         cd marketplace.frontend
         npm install
         npm run build
         mkdir -p ../marketplace-drop/frontend
-        cp -r dist/* ../marketplace-drop/frontend/
-      displayName: "Build Frontend (solo archivos finales)"
+        cp -r build/* ../marketplace-drop/frontend/
+      displayName: "Build Frontend (React CRA)"
 
     # === PUBLICAR ARTIFACT ===
     - task: PublishBuildArtifacts@1
