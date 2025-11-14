@@ -1,104 +1,128 @@
-# Decisiones de Desarrollo – TP05 & TP06 · CI/CD + Pruebas Unitarias
+# TP05-TP06 · CI/CD en Azure + Pruebas Unitarias (.NET + React)
 
-## 1. Configuración del Entorno
+**Repositorio**: `TP05-TP06-Marketplace`  
+**Pipeline**: Azure DevOps (self-hosted agent · macOS)  
+**Stages**: Build & Test → Deploy QA → Deploy Producción  
+**Autor**: Santos Romero Reyna
 
-Ingresé a mi carpeta de trabajo y cloné el repositorio del proyecto Marketplace:
+##  Objetivo
 
-```bash
-git clone https://github.com/ssantosromero/TP05-TP06-Marketplace
+### TP05 — CI/CD
+Implementar un pipeline CI/CD en Azure DevOps que:
+- Compile el backend (.NET 8)
+- Compile el frontend (React)
+- Ejecute pruebas
+- Genere artefactos
+- Despliegue a QA y Producción (simulados)
+
+### TP06 — Testing
+- Crear pruebas unitarias con xUnit
+- Integrarlas automáticamente en el pipeline
+
+##  Estructura del Repositorio
+
+```
+TP05-TP06-Marketplace/
+├── Marketplace.Api/              # Backend (.NET 8 Web API + Swagger + CORS + SQLite)
+│   ├── Controllers/              # ProductsController y CartController
+│   ├── Models/                   # Product y CartItem (con [Key])
+│   └── marketplace.db           # Base de datos SQLite generada
+├── Marketplace.Api.Tests/        # Pruebas unitarias (xUnit)
+├── marketplace.frontend/         # Frontend React con Axios
+│   ├── src/                     # Catálogo, carrito dinámico
+│   └── build/                   # Build optimizado para producción
+└── azure-pipelines.yml           # Pipeline principal CI/CD
 ```
 
-Accedí al repositorio:
+##  Tecnologías Utilizadas
 
+| Capa | Tecnología | Justificación |
+|------|------------|---------------|
+| Backend | .NET 8 Web API | Compatibilidad con Azure DevOps y EF Core |
+| Base de Datos | SQLite + Entity Framework Core | Persistencia ligera sin servidor externo |
+| Frontend | React + Axios | Velocidad de prototipado y comunicación con API |
+| Testing | xUnit | Sencillez y compatibilidad nativa con .NET |
+| CI/CD | Azure DevOps Pipelines | Integración completa con agente self-hosted |
+| Agente | Self-hosted macOS (`MacBook-Pro-de-Santos`) | Sin límites y control total del entorno |
+
+##  Configuración y Ejecución
+
+###  Setup Inicial del Proyecto
+1. Clonar el repositorio:
 ```bash
+git clone https://github.com/ssantosromero/TP05-TP06-Marketplace
 cd TP05-TP06-Marketplace
 ```
 
-Verifiqué mi configuración global de Git para asegurar trazabilidad correcta:
-
-**Comandos utilizados:**
+2. Configurar Git (trazabilidad):
 ```bash
 git config --global user.name "Santos Romero Reyna"
 git config --global user.email "santosromeroreyna@gmail.com"
 ```
 
-Confirmé la configuración con:
+3. Instalar dependencias del backend:
 ```bash
-git config --list
+cd Marketplace.Api
+dotnet restore
 ```
 
-Creé este archivo de decisiones (`decisiones.md`) para documentar paso a paso lo realizado en los TP05 y TP06.
-
-Fui realizando commits periódicos para registrar cada avance:
+4. Configurar Entity Framework Core:
 ```bash
-git add .
-git commit -m "Avance TP05/TP06 – CI/CD y pruebas"
-git push origin main
+dotnet add package Microsoft.EntityFrameworkCore
+dotnet add package Microsoft.EntityFrameworkCore.Sqlite
+dotnet add package Microsoft.EntityFrameworkCore.Tools
 ```
 
-## 2. Elección del Flujo de Trabajo
-
-Decidí utilizar un flujo simple y claro, adecuado a un proyecto personal:
-
-- **main**: rama principal con el código estable
-- **feature/\***: desarrollo de nuevas funcionalidades
-- **fix/\***: correcciones puntuales
-
-Este flujo me permitió trabajar ordenado, mantener el historial limpio y evitar conflictos innecesarios.
-
-## 3. Decisiones sobre el Backend (.NET 8)
-
-Elegí **.NET 8 Web API** por estabilidad, documentación y porque ya venía trabajando en esta tecnología.
-
-Incorporé **SQLite + Entity Framework Core**, decisión basada en:
-- simplicidad de configuración
-- no requiere servidor externo
-- ideal para entornos de desarrollo y TP
-
-Añadí **Swagger** para facilitar pruebas:
-```csharp
-app.UseSwagger();
-app.UseSwaggerUI();
+5. Crear base de datos SQLite:
+```bash
+dotnet ef migrations add Init
+dotnet ef database update
 ```
 
-Implementé **CORS** para permitir que el frontend (React) acceda a la API:
+###  Backend (.NET 8)
+1. Ejecutar la API:
+```bash
+cd Marketplace.Api
+dotnet run
+```
+
+2. Endpoints disponibles:
+   - **API**: http://localhost:5011
+   - **Swagger**: http://localhost:5011/swagger
+   - **Endpoints**: `/api/Products`, `/api/Cart`
+
+3. **CORS configurado** para React:
 ```csharp
 builder.Services.AddCors(options =>
 {
-    options.AddPolicy("AllowReactApp",
-        policy => policy.WithOrigins("http://localhost:3000")
-                        .AllowAnyHeader()
-                        .AllowAnyMethod());
+    options.AddPolicy("AllowReactApp", policy =>
+        policy.WithOrigins("http://localhost:3000")
+              .AllowAnyHeader()
+              .AllowAnyMethod());
 });
 ```
 
-Decidí agregar un **DataSeeder** para cargar datos automáticamente, evitando poblar la base manualmente.
-
-## 4. Decisiones sobre el Frontend (React)
-
-Usé **React** porque ya tenía conocimientos previos y permite crear rápidamente una UI funcional.
-
-Mantuve las dependencias al mínimo esencial.
-
-Para producción decidí generar solo el **build final**, sin subir `node_modules` al pipeline.
-
-Esto fue clave para optimizar el CI/CD (pasó de 50 minutos a menos de 1 minuto).
-
-## 5. Pruebas Unitarias (TP06)
-
-**Framework elegido**: xUnit, por:
-- integración nativa con .NET
-- sintaxis clara
-- soporte directo en Azure Pipelines
-
-Creé un proyecto separado de pruebas:
-```
-Marketplace.Api.Tests/
+###  Frontend (React)
+1. Instalar dependencias y ejecutar:
+```bash
+cd marketplace.frontend
+npm install
+npm start          # modo desarrollo (http://localhost:3000)
+npm run build      # genera /build para producción
 ```
 
-Implementé pruebas básicas que validan comportamiento del controlador.
+2. **Configuración Axios** para comunicación con API:
+```javascript
+axios.get("http://localhost:5011/api/Products")
+```
 
-**Ejemplo:**
+##  Pruebas Unitarias (xUnit)
+
+- **Ubicadas en**: `Marketplace.Api.Tests`
+- **Framework**: xUnit (compatibilidad nativa con .NET y Azure Pipelines)
+- Se ejecutan automáticamente en el stage Build & Test
+
+**Ejemplo de prueba implementada**:
 ```csharp
 [Fact]
 public void Get_ReturnsWeatherData()
@@ -109,97 +133,145 @@ public void Get_ReturnsWeatherData()
 }
 ```
 
-Ejecuté localmente:
+**Ejecución local**:
 ```bash
+cd Marketplace.Api.Tests
 dotnet test
 ```
 
-Las pruebas se integran automáticamente en el stage de **Build & Test** del pipeline.
+##  Configuración Agente Self-Hosted
 
-## 6. Construcción del Pipeline CI/CD (TP05)
+Para evitar límites del pool de Microsoft y tener control total:
 
-Utilicé un **agente self-hosted** porque:
-- evita límites del agente de Microsoft
-- permite reproducir resultados localmente
-- elimina tiempos de espera en cola
+1. **Descargar agente** desde Azure DevOps:
+   - Organization → Agent Pools → New Agent
 
-El pipeline se ejecuta desde el archivo:
-```
-azure-pipelines.yml
+2. **Instalar y configurar**:
+```bash
+./config.sh
 ```
 
-Definí **tres stages**:
-
-### a) Build & Test
-
-Incluye:
-- compilación de la API
-- ejecución de pruebas (xUnit)
-- instalación de Node.js
-- build de React
-- copia solo de la carpeta `/build`
-- publicación del artefacto `marketplace-drop`
-
-### b) Deploy QA (simulado)
-
-Descarga y verifica la integridad del artefacto.
-
-### c) Deploy Producción (simulado)
-
-Replica el proceso de QA pero orientado a PROD.
-
-Opté por que ambos despliegues sean **"simulados"**, ya que el TP05 lo permite y facilita demostrar comprensión del flujo.
-
-## 7. Optimización del Pipeline
-
-Durante la primera ejecución, detecté que Azure intentaba subir más de **38.000 archivos** del frontend, lo que causaba tiempos superiores a 50 minutos.
-
-**Decisión**: publicar solo el contenido de `marketplace.frontend/build`.
-
-Esto redujo:
-- tamaño del artifact
-- tiempo de ejecución
-- carga del agente local
-
-**Resultado final**: pipeline completo en menos de 1 minuto.
-
-## 8. Problemas Encontrados y Soluciones
-
-### 1) Advertencia ARM/x64
-
-Azure mostraba:
-```
-"X64 emulation is known to cause hangs..."
+3. **Ejecutar agente**:
+```bash
+./run.sh
 ```
 
-- Esto ocurre porque mi agente es ARM.
-- No afecta funcionalidad, por eso decidí dejarlo así.
+4. **Resultado esperado**: 
+```
+"Listening for Jobs"
+```
 
-### 2) Pipeline Cancelado por Tamaño del Artifact
+Esto permite que cada push a `main` ejecute el pipeline en el MacBook local.
 
-Se solucionó aplicando:
+## 🌊 Flujo de Trabajo (GitFlow Simplificado)
+
+**Ramas utilizadas**:
+- **main** → rama estable usada por el pipeline  
+- **feature/\*** → nuevas funcionalidades  
+- **fix/\*** → correcciones urgentes  
+
+**Ventajas**:
+- Trabajo seguro sin romper la rama principal
+- Integración continua automática
+- Pipeline se ejecuta solo en commits a `main`
+
+##  Pipeline CI/CD (azure-pipelines.yml)
+
+El pipeline ejecuta **tres stages optimizados**:
+
+### 1. Build & Test
+- ✔ **Compila backend** (.NET 8)
+- ✔ **Ejecuta pruebas unitarias** (xUnit)
+- ✔ **Instala Node.js 18**
+- ✔ **Compila frontend** (React)
+- ✔ **Copia solo `/build`** (sin node_modules)
+- ✔ **Publica artifact** `marketplace-drop`
+
+### 2. Deploy QA (simulado)
+- Descarga artifact
+- Valida integridad
+- Simula despliegue al ambiente QA
+
+### 3. Deploy Producción (simulado)
+- Replica proceso de QA
+- Representa despliegue final
+
+**⏱ Tiempo total optimizado**: < 1 minuto  
+**Optimización clave**: Publicar solo `/build` evitó subir 38,000 archivos de `node_modules`
+
+
+
+##  Problemas Encontrados y Soluciones
+
+| Problema | Causa | Solución Aplicada |
+|----------|-------|-------------------|
+| **Pipeline 50 minutos** | Subía node_modules (38,000 archivos) | Publicar solo `/build` → < 1 minuto |
+| **Axios 403 Forbidden** | Endpoint incorrecto `localhost:3001` | Corregir a `localhost:5011` |
+| **Migration sin Primary Key** | Faltaba `[Key]` en modelos | Agregar `[Key]` a Product y CartItem |
+| **Warning ARM/x64** | Agente macOS ARM | Solo informativo, no afecta funcionalidad |
+| **CORS bloqueado** | React no accedía a API | Política `AllowReactApp` configurada |
+
+### Solución CORS aplicada:
+```csharp
+builder.Services.AddCors(options =>
+{
+    options.AddPolicy("AllowReactApp", policy =>
+        policy.WithOrigins("http://localhost:3000")
+              .AllowAnyHeader()
+              .AllowAnyMethod());
+});
+```
+
+### Optimización Pipeline:
 ```yaml
+# Antes: subía todo marketplace.frontend/ (38K archivos)
+# Después: solo /build (archivos optimizados)
 cp -R marketplace.frontend/build $(Build.ArtifactStagingDirectory)/frontend
 ```
-y eliminando `node_modules`.
 
-### 3) CORS bloqueando el frontend
+##  Reflexión y Resultados Obtenidos
 
-Implementé la política `AllowReactApp` (ver sección Backend).
+### Integración Completa Lograda
 
-## 9. Reflexión Final
+Los TPs 05 y 06 permitieron implementar exitosamente:
 
-Este trabajo práctico me permitió integrar:
+- **CI/CD automatizado** con Azure DevOps
+- **Pruebas unitarias integradas** (xUnit) 
+- **Build optimizado** para producción
+- **Agente self-hosted** sin limitaciones
+- **Integración frontend-backend** funcional
+- **Pipeline de < 1 minuto** (optimizado desde 50 min iniciales)
 
-- CI/CD real con Azure DevOps
-- pruebas unitarias automatizadas
-- build optimizado para producción
-- agente self-hosted
-- integración entre frontend + backend
+### Funcionalidades Implementadas
 
-Además, dejé la base totalmente lista para el **TP07**, donde agregaré:
+**Backend (.NET 8)**:
+- API REST con ProductsController y CartController
+- Swagger integrado para documentación
+- SQLite + Entity Framework Core
+- CORS configurado para React
+- Base de datos con productos precargados
 
-- Code Coverage
-- SonarCloud
-- Cypress
-- Quality Gates
+**Frontend (React)**:
+- Catálogo de productos dinámico
+- Carrito de compras funcional  
+- Comunicación Axios con API
+- Build optimizado sin dependencias dev
+
+**Pipeline CI/CD**:
+- Compilación automática backend/frontend
+- Ejecución de tests unitarios
+- Generación de artifacts livianos
+- Despliegues simulados QA/PROD
+- Ejecución en agente propio
+
+### Preparación para TP07
+
+Con la base técnica completamente funcional, el proyecto está listo para incorporar:
+
+- **Code Coverage** detallado
+- **Análisis estático** (SonarCloud)
+- **Pruebas E2E** (Cypress)
+- **Quality Gates** estrictos
+- **Reportes integrados** en DevOps
+
+La arquitectura modular y el pipeline optimizado facilitan agregar estas herramientas de calidad sin afectar el flujo existente.
