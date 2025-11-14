@@ -52,3 +52,27 @@ public void Get_ReturnsWeatherData()
     var result = controller.Get();
     Assert.NotNull(result);
 }
+
+🖼️ Evidencias
+
+Pipeline ejecutado en Azure DevOps ✅
+
+Todos los stages en verde (Build, QA, PROD).
+
+Logs del agente local (Santos-MacBook).
+
+Resultados de pruebas exitosas.
+
+📦 Resultados
+
+Artifact marketplace-drop publicado correctamente.
+
+Ejecución total: < 1 min (optimizado).
+
+Sin errores ni warnings críticos.
+
+🧠 Reflexión
+
+Estos TPs consolidan la integración continua y las pruebas automáticas como base del ciclo DevOps.
+Se logró un pipeline funcional, reproducible y eficiente, con un agente local y ejecución validada.
+El aprendizaje clave fue entender cómo automatizar calidad y despliegue en un entorno real de desarrollo.
