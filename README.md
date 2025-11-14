@@ -124,6 +124,9 @@ Gracias a optimización (no subir `node_modules`, solo `build`).
 - Log del agente local ejecutando jobs (`Listening for Jobs`)
 <img width="612" height="368" alt="image" src="https://github.com/user-attachments/assets/28c3a024-ef2b-41dd-9b69-8ebeb3372d0f" />
 
+-Resultados de dotnet test aprobados
+<img width="317" height="402" alt="image" src="https://github.com/user-attachments/assets/7ba3a732-89a2-4505-9add-819a27b1647a" />
+
 
 
 ##  Problemas Frecuentes y Soluciones
