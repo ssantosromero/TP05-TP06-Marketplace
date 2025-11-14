@@ -115,14 +115,16 @@ El pipeline está definido en `azure-pipelines.yml` y ejecuta las siguientes eta
 **⏱ Tiempo total del pipeline**: ~50 segundos  
 Gracias a optimización (no subir `node_modules`, solo `build`).
 
-##  Evidencias (puntos a incluir)
+##  Evidencias
 
 - Captura del pipeline con los tres stages en verde
-- Artifact `marketplace-drop` generado
-- Log del agente local ejecutando jobs (`Listening for Jobs`)
-- Resultados de `dotnet test` aprobados
+  <img width="841" height="236" alt="image" src="https://github.com/user-attachments/assets/2cf518e5-6db9-4e5c-b4a6-f7425310ee39" />
+  <img width="1120" height="242" alt="image" src="https://github.com/user-attachments/assets/d06b8f80-36a7-414f-8a3a-55ba18c0fca3" />
 
-*(Podés agregar las capturas cuando entregues)*
+- Log del agente local ejecutando jobs (`Listening for Jobs`)
+<img width="612" height="368" alt="image" src="https://github.com/user-attachments/assets/28c3a024-ef2b-41dd-9b69-8ebeb3372d0f" />
+
+
 
 ##  Problemas Frecuentes y Soluciones
 
