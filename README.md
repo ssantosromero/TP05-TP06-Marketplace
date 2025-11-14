@@ -1,78 +1,28 @@
-# TP05 – CI/CD con Azure Pipelines y TP06 – Pruebas Unitarias
+#TP05–TP06 · CI/CD en Azure + Pruebas Unitarias (.NET + React)
 
-## 🎯 Objetivo
-Implementar un pipeline de integración y despliegue continuo (CI/CD) en Azure DevOps, 
-y agregar pruebas unitarias automatizadas al flujo de build.
+Repositorio: TP05-TP06-Marketplace
+Pipeline: Azure DevOps (self-hosted agent · macOS)
+Stages: Build & Test → Deploy QA → Deploy Producción
 
-## ⚙️ Tecnologías
-- Azure DevOps Pipelines
-- .NET 8 Web API (Backend)
-- React (Frontend)
-- SQLite (Base de datos)
-- xUnit (Pruebas unitarias)
-- Self-hosted Agent macOS
+#Objetivo
+TP05 — CI/CD
 
-## 🧱 Estructura del proyecto
-Copiar código
-TP05-TP06-Marketplace/
-├── Marketplace.Api/
-├── Marketplace.Api.Tests/
-├── marketplace.frontend/
-└── azure-pipelines.yml
-markdown
-Copiar código
+Implementar un pipeline CI/CD en Azure DevOps que:
 
-## 🧩 Pipeline CI/CD
-El pipeline YAML implementa tres etapas:
+Compile el backend (.NET 8)
 
-1. **Build & Test**  
-   - Compila la API y ejecuta los tests.  
-   - Publica el artifact optimizado.  
+Compile el frontend (React)
 
-2. **Deploy QA**  
-   - Simula el despliegue en entorno QA.  
+Ejecute pruebas
 
-3. **Deploy Producción**  
-   - Simula el despliegue final de la app.
+Genere artefactos
 
-Archivo principal: `azure-pipelines.yml`
+Despliegue a QA y Producción (simulados)
 
-## 🧪 Pruebas unitarias (TP06)
-- Framework: **xUnit**
-- Proyecto: `Marketplace.Api.Tests`
-- Comando local: `dotnet test`
-- Integradas en pipeline con logs `.trx`
+TP06 — Testing
 
-Ejemplo de test:
-```csharp
-[Fact]
-public void Get_ReturnsWeatherData()
-{
-    var controller = new WeatherForecastController();
-    var result = controller.Get();
-    Assert.NotNull(result);
-}
+Crear pruebas unitarias con xUnit
 
-🖼️ Evidencias
+Integrarlas automáticamente en el pipeline
 
-Pipeline ejecutado en Azure DevOps ✅
-
-Todos los stages en verde (Build, QA, PROD).
-
-Logs del agente local (Santos-MacBook).
-
-Resultados de pruebas exitosas.
-
-📦 Resultados
-
-Artifact marketplace-drop publicado correctamente.
-
-Ejecución total: < 1 min (optimizado).
-
-Sin errores ni warnings críticos.
-
-🧠 Reflexión
-
-Estos TPs consolidan la integración continua y las pruebas automáticas como base del ciclo DevOps.
-Se logró un pipeline funcional, reproducible y eficiente, con un agente local y ejecución validada.
-El aprendizaje clave fue entender cómo automatizar calidad y despliegue en un entorno real de desarrollo.
+🧱 Estructura del Repositorio
